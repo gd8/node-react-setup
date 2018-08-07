@@ -30,6 +30,9 @@ clientConfig = {
 serverConfig = {
   target: 'node',
   mode: 'development',
+  resolve: {
+    extensions: ['.ts', '.js', '.json'],
+  },
   entry: {
     server: './src/server/index.ts',
   },
