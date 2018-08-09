@@ -1,19 +1,45 @@
 import * as path from 'path';
-import { verbose, Database } from 'sqlite3';
+import { verbose, sqlite3, Database } from 'sqlite3';
+import Tweet from '../model';
 
-export class TweetDatabase {
+export default class TweetDatabase {
   private db: Database;
   private dbFile: string;
+  private sqlite3: sqlite3;
+
+  private TWEET_TABLE = 'tweets';
 
   constructor() {
-    const sqlite3 = verbose();
+    this.sqlite3 = verbose();
     this.dbFile = path.resolve(process.cwd(), 'data/tweets.db');
-    this.db = new sqlite3.Database(
+  }
+
+  private doQuery(query: string): Promise<Tweet[]> {
+    this.db = new this.sqlite3.Database(
       this.dbFile,
-      sqlite3.OPEN_READWRITE,
+      this.sqlite3.OPEN_READWRITE,
       error => {
         console.log('error', error);
       },
     );
+
+    return new Promise((resolve, reject) => {
+      this.db.all(query, [], (error, rows) => {
+        if (error) {
+          reject(error);
+        }
+        resolve(rows);
+      });
+    });
+  }
+
+  public getTweets(offset = 0, limit = 10): Promise<Tweet[]> {
+    const query = `SELECT * FROM ${
+      this.TWEET_TABLE
+    } LIMIT ${limit} OFFSET ${offset}`;
+
+    return this.doQuery(query).then(result => {
+      return result.map(row => new Tweet(row));
+    });
   }
 }
