@@ -2,19 +2,48 @@ const path = require('path');
 const webpack = require('webpack');
 
 const nodeExternals = require('webpack-node-externals');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 clientConfig = {
   target: 'web',
   mode: 'development',
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js', '.json'],
+  },
+  devtool: 'inline-source-map',
   entry: {
-    client: './src/client/index.ts',
+    vendor: ['react', 'react-dom'],
+    client: path.resolve(__dirname, 'src/client/index.tsx'),
+  },
+  externals: {
+    react: 'React',
+    'react-dom': 'ReactDOM',
   },
   module: {
-    rules: [{ test: /\.ts$/, loader: 'ts-loader', exclude: /node_modules/ }],
+    rules: [
+      {
+        test: /\.tsx?$/,
+        loader: 'ts-loader',
+        exclude: /node_modules/,
+        options: {
+          configFile: path.resolve(
+            __dirname,
+            'src/client/tsconfig-client.json',
+          ),
+        },
+      },
+    ],
   },
   output: {
     filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'dist'),
+  },
+  devServer: {
+    port: 3000,
+    open: true,
+    // proxy: {
+    //   "/api": "http://localhost:8080"
+    // }
   },
   plugins: [
     function() {
@@ -24,6 +53,9 @@ clientConfig = {
         callback();
       });
     },
+    new HtmlWebpackPlugin({
+      template: path.resolve(__dirname, 'src/client/index.html'),
+    }),
   ],
 };
 
@@ -56,4 +88,4 @@ serverConfig = {
   ],
 };
 
-module.exports = [serverConfig, clientConfig];
+module.exports = [clientConfig, serverConfig];
