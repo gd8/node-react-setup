@@ -3,6 +3,7 @@ const webpack = require('webpack');
 
 const nodeExternals = require('webpack-node-externals');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 clientConfig = {
   target: 'web',
@@ -10,27 +11,31 @@ clientConfig = {
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.json'],
   },
-  devtool: 'inline-source-map',
+  devtool: 'source-map',
   entry: {
-    vendor: ['react', 'react-dom'],
-    client: path.resolve(__dirname, 'src/client/index.tsx'),
-  },
-  externals: {
-    react: 'React',
-    'react-dom': 'ReactDOM',
+    main: path.resolve(__dirname, 'src/client/index.tsx'),
   },
   module: {
     rules: [
       {
         test: /\.tsx?$/,
-        loader: 'ts-loader',
+        loader: 'awesome-typescript-loader',
         exclude: /node_modules/,
-        options: {
-          configFile: path.resolve(
+        query: {
+          configFileName: path.resolve(
             __dirname,
             'src/client/tsconfig-client.json',
           ),
         },
+      },
+      {
+        test: /\.js$/,
+        enforce: 'pre',
+        loader: 'source-map-loader',
+      },
+      {
+        test: /\.scss$/,
+        use: ['style-loader', 'css-loader', 'sass-loader'],
       },
     ],
   },
@@ -38,9 +43,20 @@ clientConfig = {
     filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'dist'),
   },
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        vendor: {
+          chunks: 'initial',
+          name: 'vendor',
+          test: /[\\/]node_modules[\\/]/,
+          enforce: true,
+        },
+      },
+    },
+  },
   devServer: {
     port: 3000,
-    open: true,
     // proxy: {
     //   "/api": "http://localhost:8080"
     // }
@@ -53,6 +69,9 @@ clientConfig = {
         callback();
       });
     },
+    new webpack.ProvidePlugin({
+      React: 'react',
+    }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, 'src/client/index.html'),
     }),
@@ -70,7 +89,13 @@ serverConfig = {
   },
   externals: [nodeExternals()],
   module: {
-    rules: [{ test: /\.ts$/, loader: 'ts-loader', exclude: /node_modules/ }],
+    rules: [
+      {
+        test: /\.ts$/,
+        loader: 'awesome-typescript-loader',
+        exclude: /node_modules/,
+      },
+    ],
   },
   output: {
     filename: '[name].bundle.js',
