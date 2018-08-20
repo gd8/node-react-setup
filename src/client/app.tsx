@@ -14,14 +14,14 @@ export const COLUMNS: TableColumn[] = [
   { key: 'language', name: 'Language', show: true },
   { key: 'publish_date', name: 'Publish Date', show: true },
   { key: 'harvested_date', name: 'Harvested Date', show: true },
-  { key: 'following', name: 'Following', show: true },
-  { key: 'followers', name: 'Followers', show: true },
-  { key: 'updates', name: 'Updates', show: true },
-  { key: 'post_type', name: 'Post Type', show: true },
-  { key: 'account_type', name: 'Account Type', show: true },
-  { key: 'new_june_2018', name: 'New in June?', show: true },
-  { key: 'retweet', name: 'Retweet?', show: true },
-  { key: 'account_category', name: 'Account Category', show: true },
+  { key: 'following', name: 'Following', show: false },
+  { key: 'followers', name: 'Followers', show: false },
+  { key: 'updates', name: 'Updates', show: false },
+  { key: 'post_type', name: 'Post Type', show: false },
+  { key: 'account_type', name: 'Account Type', show: false },
+  { key: 'new_june_2018', name: 'New in June?', show: false },
+  { key: 'retweet', name: 'Retweet?', show: false },
+  { key: 'account_category', name: 'Account Category', show: false },
 ];
 
 export interface AppState {
@@ -30,6 +30,7 @@ export interface AppState {
 }
 
 class App extends React.Component<any, AppState> {
+  allData = mockData;
   constructor(props: any) {
     super(props);
     this.state = {
@@ -51,6 +52,15 @@ class App extends React.Component<any, AppState> {
     });
   }
 
+  filterData(key: string, value: string) {
+    this.setState({
+      data: this.allData.filter((row: any) => {
+        // TODO: refactor to helper
+        return row[key].toLowerCase().indexOf(value.toLowerCase()) > -1;
+      }),
+    });
+  }
+
   render() {
     return (
       <div>
@@ -60,7 +70,11 @@ class App extends React.Component<any, AppState> {
             options={this.state.columns}
             toggleOption={(option: SelectOption) => this.filterColumns(option)}
           />
-          <Table data={this.state.data} columns={this.state.columns} />
+          <Table
+            data={this.state.data}
+            columns={this.state.columns}
+            filterData={this.filterData.bind(this)}
+          />
         </section>
       </div>
     );

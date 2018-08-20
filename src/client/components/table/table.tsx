@@ -10,6 +10,7 @@ export interface TableColumn {
 export interface TableProps {
   data: any;
   columns: TableColumn[];
+  filterData: (key: string, value: string) => void;
 }
 
 export class Table extends React.Component<TableProps> {
@@ -17,7 +18,10 @@ export class Table extends React.Component<TableProps> {
     return (
       <div className="container scroll-x">
         <table className="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
-          <TableHeader columns={this.props.columns} />
+          <TableHeader
+            columns={this.props.columns}
+            filterColumn={this.props.filterData.bind(this)}
+          />
           <tbody>{this.createRows()}</tbody>
         </table>
       </div>

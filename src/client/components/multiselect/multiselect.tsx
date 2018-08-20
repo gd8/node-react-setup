@@ -60,7 +60,7 @@ export class MultiSelect extends React.Component<
             aria-controls="dropdown-menu"
             onClick={this.toggleDropdown.bind(this)}
           >
-            <span>Dropdown button</span>
+            <span>Columns</span>
             <span className="icon is-small">
               <i className="fas fa-angle-down" aria-hidden="true" />
             </span>
