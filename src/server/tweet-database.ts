@@ -34,12 +34,24 @@ export default class TweetDatabase {
   }
 
   public getTweets(offset = 0, limit = 10): Promise<Tweet[]> {
+    if (isNaN(offset) || isNaN(limit)) {
+      return Promise.reject(
+        new Error(
+          `Supplied query params must be integers. Offset: ${offset}, Limit: ${limit}`,
+        ),
+      );
+    }
     const query = `SELECT * FROM ${
       this.TWEET_TABLE
     } LIMIT ${limit} OFFSET ${offset}`;
 
-    return this.doQuery(query).then(result => {
-      return result.map(row => new Tweet(row));
-    });
+    return this.doQuery(query).then(
+      result => {
+        return result.map(row => new Tweet(row));
+      },
+      error => {
+        return Promise.reject(new Error(error));
+      },
+    );
   }
 }
