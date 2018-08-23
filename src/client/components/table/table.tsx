@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { TableHeader } from './table-header';
+import { TableFooter } from './table-footer';
 
 export interface TableColumn {
   key: string;
@@ -22,6 +23,7 @@ export class Table extends React.Component<TableProps> {
             columns={this.props.columns}
             filterColumn={this.props.filterData.bind(this)}
           />
+          <TableFooter colSpan={this.props.columns.length} />
           <tbody>{this.createRows()}</tbody>
         </table>
       </div>
